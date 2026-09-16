@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScamShield | Cyber Awareness Platform</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #fafdff;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--text-light);
+            overflow-x: hidden;
+        }
+
+        /* Navbar Styling */
+        .navbar-custom {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: #fff !important;
+            letter-spacing: 1px;
+        }
+
+        .navbar-brand i {
+            color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            padding: 100px 0 60px;
+            background: linear-gradient(180deg, rgba(13,110,253,0.1) 0%, rgba(15,23,42,1) 100%);
+        }
+
+        .hero-title {
+            font-weight: 700;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .hero-title span {
+            color: var(--primary-color);
+        }
+
+        /* Cards Styling */
+        .scam-card {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            color: #f8fafc;
+        }
+
+        .scam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .scam-card .card-body {
+            padding: 1.5rem;
+        }
+
+        .badge-threat {
+            font-size: 0.8rem;
+            padding: 0.4em 0.8em;
+            border-radius: 6px;
+        }
+
+        /* Forms and Inputs */
+        .form-control, .form-select{
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .form-select option {
+            background-color: var(--card-bg);
+            color: #fff;
+        }
+
+        .form-control::placeholder{
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-color);
+            color: #fff;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* Toasts (Floating Alerts) */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1055;
+        }
+
+        .toast-custom {
+            background-color: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 4px solid var(--danger-color);
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            margin-top: 10px;
+        }
+
+        .toast-header-custom {
+            background-color: transparent;
+            color: var(--text-light);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .phishing-phrase {
+            font-family: monospace;
+            background: rgba(239, 68, 68, 0.15);
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #fca5a5;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--card-bg);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fa-solid fa-shield-halved me-2"></i>ScamShield</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="#alerts">Live Alerts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#education">Education</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-primary px-4 ms-lg-3" href="#report">Report a Scam</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero-section text-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="hero-title">Stay One Step Ahead of <span>Cyber Threats</span></h1>
+                    <p class="lead  mb-4">Empowering individuals with real-time scam alerts, educational resources, and threat intelligence to navigate the digital world safely.</p>
+                    <a href="#alerts" class="btn btn-outline-light btn-lg me-2">View Active Threats</a>
+                    <a href="#education" class="btn btn-primary btn-lg">Learn How to Protect Yourself</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="alerts" class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="mb-0"><i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>Live Scam Alerts</h2>
+            <span class="badge bg-danger rounded-pill"><i class="fa-solid fa-circle-dot fa-fade me-1"></i> Live Updates Active</span>
+        </div>
+        
+        <div class="row g-4">
+            <!-- Alert Card 1 -->
+            <div class="col-md-4">
+                <div class="scam-card card">
+                    <div class="card-body">
+                        <span class="badge bg-danger badge-threat mb-2">High Severity</span>
+                        <h5 class="card-title text-white">"Pig Butchering" Crypto Scam</h5>
+                        <p class="card-text small">Scammers build long-term relationships via dating apps or text messages (wrong number pretext) to eventually trick victims into investing in fake crypto platforms.</p>
+                        <p class="mb-0 small text-info"><i class="fa-solid fa-arrow-trend-up me-1"></i> Trending on WhatsApp/Tinder</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Alert Card 2 -->
+            <div class="col-md-4">
+                <div class="scam-card card">
+                    <div class="card-body">
+                        <span class="badge bg-warning text-dark badge-threat mb-2">Medium Severity</span>
+                        <h5 class="card-title text-white">Fake Delivery Phishing (Smishing)</h5>
+                        <p class="card-text small">SMS messages claiming a package cannot be delivered due to an incomplete address, providing a malicious link to "update details" and steal credit card info.</p>
+                        <p class="mb-0 small text-info"><i class="fa-solid fa-mobile-screen me-1"></i> SMS / Text Messages</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alert Card 3 -->
+            <div class="col-md-4">
+                <div class="scam-card card">
+                    <div class="card-body">
+                        <span class="badge bg-danger badge-threat mb-2">High Severity</span>
+                        <h5 class="card-title text-white">Tech Support Pop-ups</h5>
+                        <p class="card-text small">Malicious websites freeze the browser and display fake Apple/Microsoft alerts claiming the computer is infected, urging the user to call a fake support number.</p>
+                        <p class="mb-0 small text-info"><i class="fa-solid fa-desktop me-1"></i> Web Browsers</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="education" class="container py-5">
+        <h2 class="mb-4"><i class="fa-solid fa-book-open text-primary me-2"></i>Education & Prevention</h2>
+        
+        <div class="accordion accordion-flush" id="eduAccordion" style="border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+            <div class="accordion-item" style="background-color: var(--card-bg);">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" style="background-color: var(--card-bg); color: white;">
+                        <strong>Phishing vs. Spear Phishing</strong>
+                    </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#eduAccordion" style="color: white;">
+                    <div class="accordion-body">
+                        <strong>Phishing</strong> is a broad, automated attack sending generic emails to thousands of people (e.g., "Dear Customer, reset your password"). <br><br>
+                        <strong>Spear Phishing</strong> is highly targeted. The attacker uses personal information found online to make the email seem legitimate (e.g., "Hi Matheus, attached is the invoice for your recent purchase at Hi-Fi Corp"). 
+                        <br><br><strong>Defense:</strong> Never click links in unsolicited emails. Verify directly by typing the official website URL into your browser.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="accordion-item" style="background-color: var(--card-bg);">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" style="background-color: var(--card-bg); color: white;">
+                        <strong>Social Engineering Tactics</strong>
+                    </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#eduAccordion" style="color: white;">
+                    <div class="accordion-body">
+                        Scammers manipulate human psychology. Common tactics include:<br>
+                        <ul>
+                            <li><strong>Urgency/Fear:</strong> "Your account will be deleted in 24 hours."</li>
+                            <li><strong>Authority:</strong> Pretending to be the IRS, Police, or a company CEO.</li>
+                            <li><strong>Greed:</strong> "You have an unclaimed inheritance or lottery prize."</li>
+                        </ul>
+                        <strong>Defense:</strong> Pause and verify. Legitimate organizations will not pressure you into immediate, panicked action.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="report" class="container py-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="scam-card card">
+                    <div class="card-body p-4 p-md-5">
+                        <h2 class="card-title text-center mb-4"><i class="fa-solid fa-flag text-danger me-2"></i>Report a Suspicious Incident</h2>
+                        <p class="text-center mb-4">Help us update our threat database. If you've received a suspicious message, report it below.</p>
+                        
+                        <form id="reportForm">
+                            <div class="mb-3">
+                                <label for="scamType" class="form-label">Type of Attempt</label>
+                                <select class="form-select" id="scamType" required>
+                                    <option value="" selected disabled>Select type...</option>
+                                    <option value="email">Email Phishing</option>
+                                    <option value="sms">SMS / Text (Smishing)</option>
+                                    <option value="call">Phone Call (Vishing)</option>
+                                    <option value="social">Social Media Message</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="senderInfo" class="form-label">Sender Info (Email address, phone number, etc.)</label>
+                                <input type="text" class="form-control" id="senderInfo" placeholder="e.g., support@paypal-secure-update.com">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="description" class="form-label">Message Details / Description</label>
+                                <textarea class="form-control" id="description" rows="4" placeholder="Paste the message content or describe what happened..." required></textarea>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">Submit Report Anonymously</button>
+                            </div>
+                        </form>
+                        
+                        <!-- Success Message Container -->
+                        <div id="formSuccess" class="alert alert-success mt-4 d-none" style="background-color: rgba(25, 135, 84, 0.1); border-color: rgba(25, 135, 84, 0.2); color: #75b798;">
+                            <i class="fa-solid fa-circle-check me-2"></i> Report submitted successfully. Thank you for making the internet safer!
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 Project ScamShield.</p>
+            <p class="small mt-1">This is an educational prototype.</p>
+        </div>
+    </footer>
+
+    <!-- Floating Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Form Submission Handler
+            const reportForm = document.getElementById('reportForm');
+            const formSuccess = document.getElementById('formSuccess');
+
+            reportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                // Simulate API call/processing
+                const submitBtn = reportForm.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Processing...';
+                submitBtn.disabled = true;
+
+                setTimeout(() => {
+                    reportForm.reset();
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    formSuccess.classList.remove('d-none');
+                    
+                    // Hide success message after 5 seconds
+                    setTimeout(() => {
+                        formSuccess.classList.add('d-none');
+                    }, 5000);
+                }, 1500);
+            });
+
+            // 2. Live Scam Simulation (Floating Toasts)
+            // Array of real-world scamming phrases/techniques
+            const scamScenarios = [
+                {
+                    title: "SMS Smishing Attempt",
+                    source: "Unknown Number",
+                    message: "USPS: Your package is on hold due to an incorrect address. Update here:",
+                    phrase: "usps-tracking-update-info.com",
+                    icon: "fa-solid fa-mobile-screen"
+                },
+                {
+                    title: "Bank Phishing Email",
+                    source: "security@chase-alert.com",
+                    message: "URGENT: Unusual login attempt detected. Your account will be locked in 24 hours.",
+                    phrase: "Click here to verify identity",
+                    icon: "fa-solid fa-envelope"
+                },
+                {
+                    title: "Social Media Scam",
+                    source: "Hacked Friend's Account",
+                    message: "Hey! I got locked out of my account and they need a friend to verify. I sent a code to your phone, what is it?",
+                    phrase: "Send me the 6-digit code",
+                    icon: "fa-brands fa-facebook"
+                },
+                {
+                    title: "Tech Support Scam",
+                    source: "Browser Pop-up",
+                    message: "Windows Defender Security Warning. Your computer is infected with Trojan-type spyware.",
+                    phrase: "Call Support: 1-800-XXX-XXXX",
+                    icon: "fa-solid fa-desktop"
+                },
+                {
+                    title: "Grandparent/Emergency Scam",
+                    source: "WhatsApp Message",
+                    message: "Hi mom, I dropped my phone in the toilet and I'm using this temporary number. I need to pay a bill urgently.",
+                    phrase: "Can you Apple Pay me $500?",
+                    icon: "fa-brands fa-whatsapp"
+                }
+            ];
+
+            const toastContainer = document.getElementById('toastContainer');
+            let toastCounter = 0;
+
+            // Function to create and show a toast
+            function showScamAlert() {
+                // Pick a random scenario
+                const scenario = scamScenarios[Math.floor(Math.random() * scamScenarios.length)];
+                const toastId = `toast-${toastCounter++}`;
+
+                const toastHTML = `
+                    <div id="${toastId}" class="toast toast-custom" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="8000">
+                        <div class="toast-header toast-header-custom d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="${scenario.icon} text-danger me-2"></i>
+                                <strong class="me-auto text-white">Simulated Threat Alert</strong>
+                            </div>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                        <div class="toast-body">
+                            <p class="mb-1 small text-info fw-bold">Type: ${scenario.title}</p>
+                            <p class="mb-2 text-muted small"><strong>From:</strong> ${scenario.source}</p>
+                            <p class="mb-1">"${scenario.message}"</p>
+                            <div class="phishing-phrase">
+                                <i class="fa-solid fa-fish me-1"></i> Red Flag: ${scenario.phrase}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Append to container
+                toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+
+                // Initialize and show the Bootstrap toast
+                const toastElement = document.getElementById(toastId);
+                const bsToast = new bootstrap.Toast(toastElement);
+                bsToast.show();
+
+                // Clean up DOM after it hides
+                toastElement.addEventListener('hidden.bs.toast', () => {
+                    toastElement.remove();
+                });
+            }
+
+            // Initial simulation delay, then run every 12 seconds
+            setTimeout(() => {
+                showScamAlert();
+                setInterval(showScamAlert, 12000);
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
