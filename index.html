@@ -3,452 +3,792 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScamShield | Cyber Awareness Platform</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome for Icons -->
+    <title>Smart Campus LMS & IoT Hub</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for IoT Telemetry -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        iot: {
+                            active: '#10b981',
+                            warning: '#f59e0b',
+                            danger: '#ef4444',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #fafdff;
-            --dark-bg: #0f172a;
-            --card-bg: #1e293b;
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
-            --danger-color: #ef4444;
-            --warning-color: #f59e0b;
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(229, 231, 235, 0.8);
         }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-light);
-            overflow-x: hidden;
+        .dark .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.6);
         }
-
-        /* Navbar Styling */
-        .navbar-custom {
-            background-color: rgba(15, 23, 42, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        .pulse-live {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-green 2s infinite;
         }
-
-        .navbar-brand {
-            font-weight: 700;
-            color: #fff !important;
-            letter-spacing: 1px;
-        }
-
-        .navbar-brand i {
-            color: var(--primary-color);
-        }
-
-        /* Hero Section */
-        .hero-section {
-            padding: 100px 0 60px;
-            background: linear-gradient(180deg, rgba(13,110,253,0.1) 0%, rgba(15,23,42,1) 100%);
-        }
-
-        .hero-title {
-            font-weight: 700;
-            font-size: 3rem;
-            margin-bottom: 20px;
-        }
-        
-        .hero-title span {
-            color: var(--primary-color);
-        }
-
-        /* Cards Styling */
-        .scam-card {
-            background-color: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            height: 100%;
-            color: #f8fafc;
-        }
-
-        .scam-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .scam-card .card-body {
-            padding: 1.5rem;
-        }
-
-        .badge-threat {
-            font-size: 0.8rem;
-            padding: 0.4em 0.8em;
-            border-radius: 6px;
-        }
-
-        /* Forms and Inputs */
-        .form-control, .form-select{
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
-
-        .form-select option {
-            background-color: var(--card-bg);
-            color: #fff;
-        }
-
-        .form-control::placeholder{
-            color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .form-control:focus, .form-select:focus {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: var(--primary-color);
-            color: #fff;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-
-        /* Toasts (Floating Alerts) */
-        .toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1055;
-        }
-
-        .toast-custom {
-            background-color: rgba(30, 41, 59, 0.95);
-            backdrop-filter: blur(10px);
-            border-left: 4px solid var(--danger-color);
-            color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            margin-top: 10px;
-        }
-
-        .toast-header-custom {
-            background-color: transparent;
-            color: var(--text-light);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .phishing-phrase {
-            font-family: monospace;
-            background: rgba(239, 68, 68, 0.15);
-            padding: 4px 8px;
-            border-radius: 4px;
-            color: #fca5a5;
-            display: inline-block;
-            margin-top: 8px;
-        }
-
-        /* Footer */
-        footer {
-            background-color: var(--card-bg);
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 2rem 0;
-            margin-top: 4rem;
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 font-sans transition-colors duration-200 min-h-screen flex flex-col">
 
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#"><i class="fa-solid fa-shield-halved me-2"></i>ScamShield</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="#alerts">Live Alerts</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#education">Education</a></li>
-                    <li class="nav-item"><a class="nav-link btn btn-primary px-4 ms-lg-3" href="#report">Report a Scam</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <section class="hero-section text-center">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <h1 class="hero-title">Stay One Step Ahead of <span>Cyber Threats</span></h1>
-                    <p class="lead  mb-4">Empowering individuals with real-time scam alerts, educational resources, and threat intelligence to navigate the digital world safely.</p>
-                    <a href="#alerts" class="btn btn-outline-light btn-lg me-2">View Active Threats</a>
-                    <a href="#education" class="btn btn-primary btn-lg">Learn How to Protect Yourself</a>
+    <!-- Top Navigation Bar & Role Switcher -->
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-200 dark:border-slate-800 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-brand-600 text-white p-2.5 rounded-xl flex items-center justify-center shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-microchip text-xl"></i>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="alerts" class="container py-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="mb-0"><i class="fa-solid fa-triangle-exclamation text-warning me-2"></i>Live Scam Alerts</h2>
-            <span class="badge bg-danger rounded-pill"><i class="fa-solid fa-circle-dot fa-fade me-1"></i> Live Updates Active</span>
-        </div>
-        
-        <div class="row g-4">
-            <!-- Alert Card 1 -->
-            <div class="col-md-4">
-                <div class="scam-card card">
-                    <div class="card-body">
-                        <span class="badge bg-danger badge-threat mb-2">High Severity</span>
-                        <h5 class="card-title text-white">"Pig Butchering" Crypto Scam</h5>
-                        <p class="card-text small">Scammers build long-term relationships via dating apps or text messages (wrong number pretext) to eventually trick victims into investing in fake crypto platforms.</p>
-                        <p class="mb-0 small text-info"><i class="fa-solid fa-arrow-trend-up me-1"></i> Trending on WhatsApp/Tinder</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Alert Card 2 -->
-            <div class="col-md-4">
-                <div class="scam-card card">
-                    <div class="card-body">
-                        <span class="badge bg-warning text-dark badge-threat mb-2">Medium Severity</span>
-                        <h5 class="card-title text-white">Fake Delivery Phishing (Smishing)</h5>
-                        <p class="card-text small">SMS messages claiming a package cannot be delivered due to an incomplete address, providing a malicious link to "update details" and steal credit card info.</p>
-                        <p class="mb-0 small text-info"><i class="fa-solid fa-mobile-screen me-1"></i> SMS / Text Messages</p>
-                    </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight tracking-tight">SmartPortal <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-700 dark:text-brand-300 ml-1">v3.0 IoT+AI</span></h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Campus LMS & Smart Infrastructure</p>
                 </div>
             </div>
 
-            <!-- Alert Card 3 -->
-            <div class="col-md-4">
-                <div class="scam-card card">
-                    <div class="card-body">
-                        <span class="badge bg-danger badge-threat mb-2">High Severity</span>
-                        <h5 class="card-title text-white">Tech Support Pop-ups</h5>
-                        <p class="card-text small">Malicious websites freeze the browser and display fake Apple/Microsoft alerts claiming the computer is infected, urging the user to call a fake support number.</p>
-                        <p class="mb-0 small text-info"><i class="fa-solid fa-desktop me-1"></i> Web Browsers</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="education" class="container py-5">
-        <h2 class="mb-4"><i class="fa-solid fa-book-open text-primary me-2"></i>Education & Prevention</h2>
-        
-        <div class="accordion accordion-flush" id="eduAccordion" style="border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-            <div class="accordion-item" style="background-color: var(--card-bg);">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" style="background-color: var(--card-bg); color: white;">
-                        <strong>Phishing vs. Spear Phishing</strong>
+            <!-- Role Switcher & Config -->
+            <div class="flex items-center gap-4">
+                <div class="bg-slate-200 dark:bg-slate-800 p-1 rounded-xl flex items-center gap-1 text-xs font-semibold">
+                    <button id="role-student-btn" onclick="switchRole('student')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm">
+                        <i class="fa-solid fa-user-graduate"></i> Student
                     </button>
-                </h2>
-                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#eduAccordion" style="color: white;">
-                    <div class="accordion-body">
-                        <strong>Phishing</strong> is a broad, automated attack sending generic emails to thousands of people (e.g., "Dear Customer, reset your password"). <br><br>
-                        <strong>Spear Phishing</strong> is highly targeted. The attacker uses personal information found online to make the email seem legitimate (e.g., "Hi Matheus, attached is the invoice for your recent purchase at Hi-Fi Corp"). 
-                        <br><br><strong>Defense:</strong> Never click links in unsolicited emails. Verify directly by typing the official website URL into your browser.
-                    </div>
-                </div>
-            </div>
-            
-            <div class="accordion-item" style="background-color: var(--card-bg);">
-                <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" style="background-color: var(--card-bg); color: white;">
-                        <strong>Social Engineering Tactics</strong>
+                    <button id="role-lecturer-btn" onclick="switchRole('lecturer')" class="px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                        <i class="fa-solid fa-chalkboard-user"></i> Lecturer
                     </button>
-                </h2>
-                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#eduAccordion" style="color: white;">
-                    <div class="accordion-body">
-                        Scammers manipulate human psychology. Common tactics include:<br>
-                        <ul>
-                            <li><strong>Urgency/Fear:</strong> "Your account will be deleted in 24 hours."</li>
-                            <li><strong>Authority:</strong> Pretending to be the IRS, Police, or a company CEO.</li>
-                            <li><strong>Greed:</strong> "You have an unclaimed inheritance or lottery prize."</li>
-                        </ul>
-                        <strong>Defense:</strong> Pause and verify. Legitimate organizations will not pressure you into immediate, panicked action.
-                    </div>
                 </div>
+
+                <!-- API Key Config Button -->
+                <button onclick="toggleKeyModal()" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition" title="Configure Gemini API Key">
+                    <i class="fa-solid fa-key"></i>
+                </button>
+
+                <!-- Theme Switcher -->
+                <button id="theme-toggle-btn" onclick="toggleTheme()" class="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block"></i>
+                </button>
             </div>
         </div>
-    </section>
+    </header>
 
-    <section id="report" class="container py-5 mb-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="scam-card card">
-                    <div class="card-body p-4 p-md-5">
-                        <h2 class="card-title text-center mb-4"><i class="fa-solid fa-flag text-danger me-2"></i>Report a Suspicious Incident</h2>
-                        <p class="text-center mb-4">Help us update our threat database. If you've received a suspicious message, report it below.</p>
-                        
-                        <form id="reportForm">
-                            <div class="mb-3">
-                                <label for="scamType" class="form-label">Type of Attempt</label>
-                                <select class="form-select" id="scamType" required>
-                                    <option value="" selected disabled>Select type...</option>
-                                    <option value="email">Email Phishing</option>
-                                    <option value="sms">SMS / Text (Smishing)</option>
-                                    <option value="call">Phone Call (Vishing)</option>
-                                    <option value="social">Social Media Message</option>
-                                    <option value="other">Other</option>
-                                </select>
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+        <!-- Left / Top Main Content Area (Spans 3 cols) -->
+        <section class="lg:col-span-3 space-y-6">
+
+            <!-- ================= STUDENT DASHBOARD VIEW ================= -->
+            <div id="student-view" class="space-y-6">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-brand-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl relative overflow-hidden">
+                    <div class="relative z-10 space-y-2">
+                        <span class="bg-white/20 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold">Student Portal</span>
+                        <h2 class="text-2xl font-bold">Welcome back, Alex Smith!</h2>
+                        <p class="text-brand-100 text-sm max-w-xl">You have 2 classes scheduled today in IoT Smart Lab 4B. RFID auto-attendance is active.</p>
+                    </div>
+                    <i class="fa-solid fa-graduation-cap absolute -right-4 -bottom-6 text-9xl opacity-15"></i>
+                </div>
+
+                <!-- IoT Live Campus Status Widget Bar -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                        <div class="p-3 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                            <i class="fa-solid fa-id-card text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500">RFID Attendance</span>
+                            <div class="font-bold text-sm text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-live"></span> Verified
                             </div>
-                            
-                            <div class="mb-3">
-                                <label for="senderInfo" class="form-label">Sender Info (Email address, phone number, etc.)</label>
-                                <input type="text" class="form-control" id="senderInfo" placeholder="e.g., support@paypal-secure-update.com">
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="description" class="form-label">Message Details / Description</label>
-                                <textarea class="form-control" id="description" rows="4" placeholder="Paste the message content or describe what happened..." required></textarea>
-                            </div>
-                            
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary btn-lg">Submit Report Anonymously</button>
-                            </div>
-                        </form>
-                        
-                        <!-- Success Message Container -->
-                        <div id="formSuccess" class="alert alert-success mt-4 d-none" style="background-color: rgba(25, 135, 84, 0.1); border-color: rgba(25, 135, 84, 0.2); color: #75b798;">
-                            <i class="fa-solid fa-circle-check me-2"></i> Report submitted successfully. Thank you for making the internet safer!
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                        <div class="p-3 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg">
+                            <i class="fa-solid fa-thermometer text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500">Lab 4B Temp</span>
+                            <div class="font-bold text-sm text-slate-800 dark:text-slate-100" id="student-temp-val">22.4 °C</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                        <div class="p-3 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg">
+                            <i class="fa-solid fa-chair text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500">Lib Seats Avail</span>
+                            <div class="font-bold text-sm text-purple-600 dark:text-purple-400" id="student-lib-seats">34 / 120</div>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-xl flex items-center gap-3">
+                        <div class="p-3 bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-lg">
+                            <i class="fa-solid fa-print text-xl"></i>
+                        </div>
+                        <div>
+                            <span class="text-xs text-slate-500">3D Printer status</span>
+                            <div class="font-bold text-sm text-amber-600 dark:text-amber-400">2 Active</div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Enrolled Courses & Progress -->
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-brand-500"></i> Active Enrolled Courses
+                        </h3>
+                        <span class="text-xs text-slate-500">Semester 2 - 2026</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Course 1 -->
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/50 space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-300">CS-402</span>
+                                    <h4 class="font-bold mt-1">IoT Systems Architecture</h4>
+                                    <p class="text-xs text-slate-500">Prof. Marcus Vance • Room 4B</p>
+                                </div>
+                                <span class="text-xs bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 px-2 py-1 rounded-md font-semibold">A Grade</span>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span>Course Progress</span>
+                                    <span class="font-medium">78%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-brand-500 h-full rounded-full" style="width: 78%"></div>
+                                </div>
+                            </div>
+                            <button onclick="requestAIStudyGuide('IoT Systems Architecture')" class="w-full py-2 px-3 text-xs bg-slate-100 dark:bg-slate-700 hover:bg-brand-50 dark:hover:bg-brand-900/30 text-brand-600 dark:text-brand-300 font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Study Guide
+                            </button>
+                        </div>
+
+                        <!-- Course 2 -->
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/50 space-y-3">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="text-xs font-semibold px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-300">AI-301</span>
+                                    <h4 class="font-bold mt-1">Applied Machine Learning</h4>
+                                    <p class="text-xs text-slate-500">Dr. Elena Rostova • Online/Lab 2</p>
+                                </div>
+                                <span class="text-xs bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 px-2 py-1 rounded-md font-semibold">B+ Grade</span>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex justify-between text-xs">
+                                    <span>Course Progress</span>
+                                    <span class="font-medium">62%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                                    <div class="bg-purple-500 h-full rounded-full" style="width: 62%"></div>
+                                </div>
+                            </div>
+                            <button onclick="requestAIStudyGuide('Applied Machine Learning')" class="w-full py-2 px-3 text-xs bg-slate-100 dark:bg-slate-700 hover:bg-purple-50 dark:hover:bg-purple-900/30 text-purple-600 dark:text-purple-300 font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Study Guide
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment Draft Reviewer Helper -->
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <h3 class="font-bold text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-file-pen text-indigo-500"></i> AI Assignment Reviewer & Submission Assistant
+                    </h3>
+                    <p class="text-xs text-slate-500">Paste your assignment draft below to receive instant automated formative feedback prior to final grading.</p>
+                    
+                    <div class="space-y-3">
+                        <input type="text" id="assignment-title" placeholder="Assignment Title (e.g., MQTT Protocol Analysis Draft)" class="w-full p-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <textarea id="assignment-content" rows="4" placeholder="Paste your essay snippet or project description here..." class="w-full p-3 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+                        <button onclick="reviewAssignmentWithAI()" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition flex items-center gap-2 shadow-lg shadow-brand-500/20">
+                            <i class="fa-solid fa-robot"></i> Review My Draft with AI
+                        </button>
+                    </div>
+
+                    <div id="assignment-feedback-box" class="hidden p-4 rounded-xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-sm space-y-2">
+                        <h4 class="font-bold text-brand-600 dark:text-brand-400 flex items-center gap-2">
+                            <i class="fa-solid fa-check-circle"></i> AI Review Feedback
+                        </h4>
+                        <div id="assignment-feedback-text" class="text-xs leading-relaxed space-y-2 whitespace-pre-line"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= LECTURER DASHBOARD VIEW ================= -->
+            <div id="lecturer-view" class="hidden space-y-6">
+                <!-- Welcome Banner -->
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-900 dark:to-black rounded-2xl p-6 text-white shadow-xl relative overflow-hidden border border-slate-700">
+                    <div class="relative z-10 space-y-2">
+                        <span class="bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold">Lecturer Portal</span>
+                        <h2 class="text-2xl font-bold">Welcome, Prof. Marcus Vance</h2>
+                        <p class="text-slate-300 text-sm max-w-xl">Class RFID Attendance rate is at 94% today. All IoT Lab environment sensors operational.</p>
+                    </div>
+                    <i class="fa-solid fa-chalkboard-user absolute -right-4 -bottom-6 text-9xl opacity-10"></i>
+                </div>
+
+                <!-- IoT Campus Controls for Lecturer -->
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-bold text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-brand-500"></i> Smart Classroom & Lab IoT Remote Control
+                        </h3>
+                        <span class="text-xs bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 px-2.5 py-1 rounded-full font-semibold">IoT Hub Connected</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <!-- Control 1: AC -->
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/50 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-sm">Lab 4B AC / Temp</span>
+                                <i class="fa-solid fa-fan text-brand-500 animate-spin"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-2xl font-bold" id="lecturer-temp-display">22.0 °C</span>
+                                <div class="flex gap-1">
+                                    <button onclick="adjustTemp(-0.5)" class="p-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 rounded-lg text-xs font-bold">-</button>
+                                    <button onclick="adjustTemp(0.5)" class="p-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 rounded-lg text-xs font-bold">+</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Control 2: Lighting -->
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/50 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-sm">Lighting Dimmer</span>
+                                <i class="fa-solid fa-lightbulb text-amber-500"></i>
+                            </div>
+                            <input type="range" id="light-slider" min="0" max="100" value="85" oninput="updateLighting(this.value)" class="w-full accent-brand-500">
+                            <div class="text-xs text-slate-500 flex justify-between">
+                                <span>Brightness</span>
+                                <span id="light-val" class="font-bold">85%</span>
+                            </div>
+                        </div>
+
+                        <!-- Control 3: RFID Lock -->
+                        <div class="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/50 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-sm">RFID Door Access</span>
+                                <i class="fa-solid fa-lock text-emerald-500" id="door-icon"></i>
+                            </div>
+                            <button id="door-toggle-btn" onclick="toggleDoorLock()" class="w-full py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition">
+                                Door Unlocked (Session Active)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Tools for Lecturers -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- AI Quiz Generator -->
+                    <div class="glass-panel p-5 rounded-2xl space-y-4">
+                        <h3 class="font-bold text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-feather-pointed text-purple-500"></i> AI Quiz & Question Generator
+                        </h3>
+                        <p class="text-xs text-slate-500">Instantly generate custom quiz questions based on topic and difficulty.</p>
+
+                        <div class="space-y-3">
+                            <input type="text" id="quiz-topic" placeholder="Topic (e.g. MQTT Protocol QoS levels)" class="w-full p-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                            <div class="flex gap-2">
+                                <select id="quiz-diff" class="flex-1 p-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate" selected>Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                                <button onclick="generateAIQuiz()" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold transition flex items-center gap-2">
+                                    <i class="fa-solid fa-bolt"></i> Generate
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="quiz-output-box" class="hidden p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs space-y-2 whitespace-pre-line max-h-60 overflow-y-auto"></div>
+                    </div>
+
+                    <!-- AI Auto-Grading & Feedback Assistant -->
+                    <div class="glass-panel p-5 rounded-2xl space-y-4">
+                        <h3 class="font-bold text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-square-poll-vertical text-brand-500"></i> AI Student Submission Auto-Grader
+                        </h3>
+                        <p class="text-xs text-slate-500">Paste student submission code/text to generate grade suggestions and detailed constructive feedback.</p>
+
+                        <div class="space-y-3">
+                            <textarea id="student-submission" rows="3" placeholder="Paste student answer/submission snippet..." class="w-full p-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"></textarea>
+                            <button onclick="gradeSubmissionWithAI()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-calculator"></i> Generate Grade Suggestion
+                            </button>
+                        </div>
+
+                        <div id="grade-output-box" class="hidden p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs space-y-2 whitespace-pre-line max-h-60 overflow-y-auto"></div>
+                    </div>
+                </div>
+
+                <!-- Class Analytics Table -->
+                <div class="glass-panel p-5 rounded-2xl space-y-4">
+                    <h3 class="font-bold text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-users text-emerald-500"></i> Class Roster & Real-time RFID Attendance
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs text-left">
+                            <thead class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                                <tr>
+                                    <th class="p-3 rounded-l-lg">Student Name</th>
+                                    <th class="p-3">ID Number</th>
+                                    <th class="p-3">RFID Status</th>
+                                    <th class="p-3">Avg Quiz Score</th>
+                                    <th class="p-3 rounded-r-lg">Risk Alert</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                                <tr>
+                                    <td class="p-3 font-semibold">Alex Smith</td>
+                                    <td class="p-3 font-mono text-slate-500">STU-88412</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-semibold">Present (08:58 AM)</span></td>
+                                    <td class="p-3 font-medium">92%</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">Low</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold">David Chen</td>
+                                    <td class="p-3 font-mono text-slate-500">STU-88415</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 font-semibold">Present (09:02 AM)</span></td>
+                                    <td class="p-3 font-medium">85%</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">Low</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-semibold">Sarah Jenkins</td>
+                                    <td class="p-3 font-mono text-slate-500">STU-88420</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 font-semibold">Absent</span></td>
+                                    <td class="p-3 font-medium">58%</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 rounded bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400 font-semibold">High Risk</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Telemetry IoT Telemetry Chart -->
+            <div class="glass-panel p-5 rounded-2xl space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-chart-line text-brand-500"></i> Campus Telemetry Stream
+                    </h3>
+                    <span class="text-xs text-slate-500">Updated every 3s</span>
+                </div>
+                <div class="h-48 w-full">
+                    <canvas id="iotChart"></canvas>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Right Side Floating Chat Assistant Widget (Spans 1 col) -->
+        <aside class="lg:col-span-1 space-y-6">
+            <div class="glass-panel p-4 rounded-2xl space-y-4 h-[620px] flex flex-col sticky top-20 shadow-lg border border-brand-500/20">
+                <!-- Chat Header -->
+                <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-indigo-600 text-white flex items-center justify-center font-bold text-sm">
+                            <i class="fa-solid fa-robot"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm">Campus AI Assistant</h4>
+                            <p class="text-[10px] text-slate-500">Powered by Gemini AI</p>
+                        </div>
+                    </div>
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-live"></span>
+                </div>
+
+                <!-- Chat Messages Box -->
+                <div id="chat-box" class="flex-1 overflow-y-auto space-y-3 p-1 text-xs">
+                    <div class="bg-slate-100 dark:bg-slate-800/80 p-3 rounded-2xl rounded-tl-none max-w-[88%] space-y-1">
+                        <span class="font-semibold text-brand-600 dark:text-brand-400 text-[10px] block">AI Assistant</span>
+                        <p>Hello! I am your Smart Campus AI Tutor and Assistant. How can I help you today?</p>
+                    </div>
+                </div>
+
+                <!-- Chat Input Area -->
+                <div class="space-y-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                    <div class="flex gap-2">
+                        <input type="text" id="chat-input" placeholder="Ask a question..." onkeypress="handleChatKeypress(event)" class="flex-1 p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <button onclick="sendChatMessage()" class="p-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-xl transition">
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Gemini API Key Configuration Modal -->
+    <div id="key-modal" class="hidden fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel bg-white dark:bg-slate-900 p-6 rounded-2xl max-w-md w-full space-y-4 shadow-2xl border border-slate-200 dark:border-slate-700">
+            <div class="flex justify-between items-center">
+                <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-key text-amber-500"></i> Configure API Key</h3>
+                <button onclick="toggleKeyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <p class="text-xs text-slate-500">Enter your Gemini API key below to enable live responses from Google Gemini AI. If left empty, the application will automatically fall back to simulated AI mode.</p>
+            <input type="password" id="gemini-key-input" placeholder="AIzaSy..." class="w-full p-3 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <div class="flex justify-end gap-2">
+                <button onclick="toggleKeyModal()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200">Cancel</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 rounded-xl text-xs font-semibold bg-brand-600 text-white hover:bg-brand-700">Save Key</button>
             </div>
         </div>
-    </section>
+    </div>
 
-    <footer class="text-center">
-        <div class="container">
-            <p class="mb-0">&copy; 2026 Project ScamShield.</p>
-            <p class="small mt-1">This is an educational prototype.</p>
-        </div>
-    </footer>
-
-    <!-- Floating Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Bootstrap 5 JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel bg-slate-900 text-white px-4 py-3 rounded-xl text-xs flex items-center gap-2 shadow-2xl">
+        <i class="fa-solid fa-circle-info text-brand-400" id="toast-icon"></i>
+        <span id="toast-msg">Notification</span>
+    </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            
-            // 1. Form Submission Handler
-            const reportForm = document.getElementById('reportForm');
-            const formSuccess = document.getElementById('formSuccess');
+        // Global Application State
+        let currentRole = 'student';
+        let apiKey = localStorage.getItem('gemini_api_key') || '';
+        let roomTemp = 22.4;
+        let isDoorLocked = false;
+        let telemetryChart = null;
 
-            reportForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                // Simulate API call/processing
-                const submitBtn = reportForm.querySelector('button[type="submit"]');
-                const originalText = submitBtn.innerHTML;
-                
-                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Processing...';
-                submitBtn.disabled = true;
+        // Initialize App
+        window.onload = function() {
+            initChart();
+            startIoTSimulation();
+            if (apiKey) {
+                document.getElementById('gemini-key-input').value = apiKey;
+            }
+        };
 
-                setTimeout(() => {
-                    reportForm.reset();
-                    submitBtn.innerHTML = originalText;
-                    submitBtn.disabled = false;
-                    formSuccess.classList.remove('d-none');
-                    
-                    // Hide success message after 5 seconds
-                    setTimeout(() => {
-                        formSuccess.classList.add('d-none');
-                    }, 5000);
-                }, 1500);
-            });
+        // Switch User Role (Student <-> Lecturer)
+        function switchRole(role) {
+            currentRole = role;
+            const studentView = document.getElementById('student-view');
+            const lecturerView = document.getElementById('lecturer-view');
+            const studentBtn = document.getElementById('role-student-btn');
+            const lecturerBtn = document.getElementById('role-lecturer-btn');
 
-            // 2. Live Scam Simulation (Floating Toasts)
-            // Array of real-world scamming phrases/techniques
-            const scamScenarios = [
-                {
-                    title: "SMS Smishing Attempt",
-                    source: "Unknown Number",
-                    message: "USPS: Your package is on hold due to an incorrect address. Update here:",
-                    phrase: "usps-tracking-update-info.com",
-                    icon: "fa-solid fa-mobile-screen"
-                },
-                {
-                    title: "Bank Phishing Email",
-                    source: "security@chase-alert.com",
-                    message: "URGENT: Unusual login attempt detected. Your account will be locked in 24 hours.",
-                    phrase: "Click here to verify identity",
-                    icon: "fa-solid fa-envelope"
-                },
-                {
-                    title: "Social Media Scam",
-                    source: "Hacked Friend's Account",
-                    message: "Hey! I got locked out of my account and they need a friend to verify. I sent a code to your phone, what is it?",
-                    phrase: "Send me the 6-digit code",
-                    icon: "fa-brands fa-facebook"
-                },
-                {
-                    title: "Tech Support Scam",
-                    source: "Browser Pop-up",
-                    message: "Windows Defender Security Warning. Your computer is infected with Trojan-type spyware.",
-                    phrase: "Call Support: 1-800-XXX-XXXX",
-                    icon: "fa-solid fa-desktop"
-                },
-                {
-                    title: "Grandparent/Emergency Scam",
-                    source: "WhatsApp Message",
-                    message: "Hi mom, I dropped my phone in the toilet and I'm using this temporary number. I need to pay a bill urgently.",
-                    phrase: "Can you Apple Pay me $500?",
-                    icon: "fa-brands fa-whatsapp"
-                }
-            ];
+            if (role === 'student') {
+                studentView.classList.remove('hidden');
+                lecturerView.classList.add('hidden');
 
-            const toastContainer = document.getElementById('toastContainer');
-            let toastCounter = 0;
+                studentBtn.className = "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm";
+                lecturerBtn.className = "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+                showToast("Switched to Student Portal View");
+            } else {
+                studentView.classList.add('hidden');
+                lecturerView.classList.remove('hidden');
 
-            // Function to create and show a toast
-            function showScamAlert() {
-                // Pick a random scenario
-                const scenario = scamScenarios[Math.floor(Math.random() * scamScenarios.length)];
-                const toastId = `toast-${toastCounter++}`;
+                lecturerBtn.className = "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 bg-white dark:bg-slate-700 text-purple-600 dark:text-purple-400 shadow-sm";
+                studentBtn.className = "px-3 py-1.5 rounded-lg transition-all flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white";
+                showToast("Switched to Lecturer Portal View");
+            }
+        }
 
-                const toastHTML = `
-                    <div id="${toastId}" class="toast toast-custom" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="8000">
-                        <div class="toast-header toast-header-custom d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="${scenario.icon} text-danger me-2"></i>
-                                <strong class="me-auto text-white">Simulated Threat Alert</strong>
-                            </div>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
-                        </div>
-                        <div class="toast-body">
-                            <p class="mb-1 small text-info fw-bold">Type: ${scenario.title}</p>
-                            <p class="mb-2 text-muted small"><strong>From:</strong> ${scenario.source}</p>
-                            <p class="mb-1">"${scenario.message}"</p>
-                            <div class="phishing-phrase">
-                                <i class="fa-solid fa-fish me-1"></i> Red Flag: ${scenario.phrase}
-                            </div>
-                        </div>
-                    </div>
-                `;
+        // Toggle Dark/Light Mode
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            showToast("Theme toggled");
+        }
 
-                // Append to container
-                toastContainer.insertAdjacentHTML('beforeend', toastHTML);
+        // Toggle API Key Modal
+        function toggleKeyModal() {
+            const modal = document.getElementById('key-modal');
+            modal.classList.toggle('hidden');
+        }
 
-                // Initialize and show the Bootstrap toast
-                const toastElement = document.getElementById(toastId);
-                const bsToast = new bootstrap.Toast(toastElement);
-                bsToast.show();
+        // Save API Key
+        function saveApiKey() {
+            const val = document.getElementById('gemini-key-input').value.trim();
+            apiKey = val;
+            localStorage.setItem('gemini_api_key', val);
+            toggleKeyModal();
+            showToast(val ? "Gemini API Key Saved!" : "API Key Cleared (Using Fallback Simulator)");
+        }
 
-                // Clean up DOM after it hides
-                toastElement.addEventListener('hidden.bs.toast', () => {
-                    toastElement.remove();
-                });
+        // Toast Notification System
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // ================= Gemini AI Integration Core =================
+        async function callGeminiAI(prompt, systemInstruction = "") {
+            if (!apiKey) {
+                // Return intelligent simulated response if API key is not set
+                await new Promise(r => setTimeout(r, 1200));
+                return simulateAIResponse(prompt);
             }
 
-            // Initial simulation delay, then run every 12 seconds
-            setTimeout(() => {
-                showScamAlert();
-                setInterval(showScamAlert, 12000);
+            try {
+                // Direct call to Gemini 2.0 Flash REST endpoint
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                
+                const bodyData = {
+                    contents: [{ parts: [{ text: prompt }] }],
+                    systemInstruction: systemInstruction ? { parts: [{ text: systemInstruction }] } : undefined
+                };
+
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bodyData)
+                });
+
+                const data = await res.json();
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    return data.candidates[0].content.parts[0].text;
+                } else {
+                    throw new Error("Invalid response format");
+                }
+            } catch (err) {
+                console.warn("API Call failed, using fallback simulator:", err);
+                return simulateAIResponse(prompt);
+            }
+        }
+
+        // Fallback AI Simulator Engine
+        function simulateAIResponse(prompt) {
+            const p = prompt.toLowerCase();
+            if (p.includes("quiz") || p.includes("question")) {
+                return `**Generated Quiz Question:**\n\n1. What is the main purpose of the MQTT protocol in IoT architecture?\n- A) High latency bulk data transfer\n- B) Lightweight publish/subscribe messaging\n- C) Relational database management\n- D) HTML webpage rendering\n\n**Correct Answer:** B) Lightweight publish/subscribe messaging.`;
+            } else if (p.includes("review") || p.includes("grade") || p.includes("submission")) {
+                return `**AI Formative Evaluation:**\n\n- **Suggested Score:** 88 / 100 (Grade: A-)\n- **Strengths:** Excellent clarity on hardware sensor integration.\n- **Improvement Areas:** Elaborate further on QoS level 1 vs level 2 packet overhead in low-bandwidth scenarios.`;
+            } else if (p.includes("study guide") || p.includes("summary")) {
+                return `**AI Executive Study Summary:**\n\n1. **Core Concept:** Sensor data acquisition & cloud gateways.\n2. **Key Terms:** Edge Computing, MQTT Broker, RFID UID Scanning.\n3. **Exam Tip:** Focus on sensor noise filtering techniques.`;
+            } else {
+                return `Based on your course materials in Smart Campus LMS, I recommend focusing on sensor telemetry protocols and energy-efficient MCU sleep modes for your upcoming evaluation. Let me know if you need specific code examples!`;
+            }
+        }
+
+        // ================= Interactive Chat Assistant =================
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            appendMessage('User', msg, 'user');
+            input.value = '';
+
+            const loadingId = appendMessage('AI Assistant', 'Thinking...', 'ai');
+
+            const systemPrompt = `You are an AI Academic & Campus Assistant for students and lecturers at SmartPortal. Keep responses concise and clear. Current user role: ${currentRole}.`;
+            const reply = await callGeminiAI(msg, systemPrompt);
+
+            document.getElementById(loadingId).querySelector('p').innerText = reply;
+        }
+
+        function handleChatKeypress(e) {
+            if (e.key === 'Enter') sendChatMessage();
+        }
+
+        function appendMessage(sender, text, type) {
+            const chatBox = document.getElementById('chat-box');
+            const id = 'msg-' + Date.now();
+            const msgDiv = document.createElement('div');
+            msgDiv.id = id;
+
+            if (type === 'user') {
+                msgDiv.className = "bg-brand-600 text-white p-3 rounded-2xl rounded-tr-none max-w-[88%] ml-auto space-y-1";
+                msgDiv.innerHTML = `<span class="font-semibold text-[10px] text-brand-100 block">You</span><p>${escapeHtml(text)}</p>`;
+            } else {
+                msgDiv.className = "bg-slate-100 dark:bg-slate-800/80 p-3 rounded-2xl rounded-tl-none max-w-[88%] space-y-1";
+                msgDiv.innerHTML = `<span class="font-semibold text-brand-600 dark:text-brand-400 text-[10px] block">${sender}</span><p>${escapeHtml(text)}</p>`;
+            }
+
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return id;
+        }
+
+        // ================= AI Features for Students & Lecturers =================
+        async function requestAIStudyGuide(courseName) {
+            showToast(`Generating Study Guide for ${courseName}...`);
+            const prompt = `Create a 3-bullet executive study guide for the course: ${courseName}.`;
+            const result = await callGeminiAI(prompt);
+            
+            appendMessage('AI Tutor', `**Study Guide for ${courseName}:**\n\n${result}`, 'ai');
+        }
+
+        async function reviewAssignmentWithAI() {
+            const title = document.getElementById('assignment-title').value.trim();
+            const content = document.getElementById('assignment-content').value.trim();
+            if (!content) {
+                showToast("Please enter assignment content first!");
+                return;
+            }
+
+            const box = document.getElementById('assignment-feedback-box');
+            const textEl = document.getElementById('assignment-feedback-text');
+            box.classList.remove('hidden');
+            textEl.innerText = "Analyzing assignment with Gemini AI...";
+
+            const prompt = `Review this student assignment draft titled '${title}':\n\n"${content}"\n\nProvide constructive feedback and key suggestions for improvement.`;
+            const feedback = await callGeminiAI(prompt, "You are an automated academic feedback assistant.");
+            textEl.innerText = feedback;
+        }
+
+        async function generateAIQuiz() {
+            const topic = document.getElementById('quiz-topic').value.trim() || "IoT Architecture";
+            const diff = document.getElementById('quiz-diff').value;
+
+            const box = document.getElementById('quiz-output-box');
+            box.classList.remove('hidden');
+            box.innerText = "Generating quiz questions...";
+
+            const prompt = `Generate a ${diff} level quiz question with 4 multiple choice options and the correct answer on topic: ${topic}.`;
+            const quiz = await callGeminiAI(prompt, "You are an expert professor creating exam questions.");
+            box.innerText = quiz;
+        }
+
+        async function gradeSubmissionWithAI() {
+            const submission = document.getElementById('student-submission').value.trim();
+            if (!submission) {
+                showToast("Please paste a student submission snippet!");
+                return;
+            }
+
+            const box = document.getElementById('grade-output-box');
+            box.classList.remove('hidden');
+            box.innerText = "Calculating grade suggestion...";
+
+            const prompt = `Grade the following student answer snippet:\n\n"${submission}"\n\nProvide a score out of 100, letter grade, and 2 brief comments.`;
+            const grade = await callGeminiAI(prompt, "You are an auto-grading AI assistant for lecturers.");
+            box.innerText = grade;
+        }
+
+        // ================= IoT Simulation Engine & Telemetry =================
+        function adjustTemp(delta) {
+            roomTemp = parseFloat((roomTemp + delta).toFixed(1));
+            document.getElementById('student-temp-val').innerText = `${roomTemp} °C`;
+            document.getElementById('lecturer-temp-display').innerText = `${roomTemp} °C`;
+            showToast(`Room Temperature set to ${roomTemp} °C`);
+        }
+
+        function updateLighting(val) {
+            document.getElementById('light-val').innerText = `${val}%`;
+        }
+
+        function toggleDoorLock() {
+            isDoorLocked = !isDoorLocked;
+            const btn = document.getElementById('door-toggle-btn');
+            const icon = document.getElementById('door-icon');
+
+            if (isDoorLocked) {
+                btn.className = "w-full py-2 bg-red-600 text-white rounded-lg text-xs font-semibold hover:bg-red-700 transition";
+                btn.innerText = "Door Locked (Security Active)";
+                icon.className = "fa-solid fa-lock text-red-500";
+                showToast("Lab RFID Door Locked");
+            } else {
+                btn.className = "w-full py-2 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 transition";
+                btn.innerText = "Door Unlocked (Session Active)";
+                icon.className = "fa-solid fa-lock-open text-emerald-500";
+                showToast("Lab RFID Door Unlocked");
+            }
+        }
+
+        function startIoTSimulation() {
+            setInterval(() => {
+                // Random fluctuate seating & temp slightly
+                const seats = Math.floor(30 + Math.random() * 10);
+                document.getElementById('student-lib-seats').innerText = `${seats} / 120`;
+
+                // Update Telemetry Chart
+                if (telemetryChart) {
+                    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    telemetryChart.data.labels.push(now);
+                    telemetryChart.data.datasets[0].data.push((roomTemp + (Math.random() * 0.4 - 0.2)).toFixed(1));
+                    telemetryChart.data.datasets[1].data.push(Math.floor(40 + Math.random() * 25)); // noise in dB
+
+                    if (telemetryChart.data.labels.length > 7) {
+                        telemetryChart.data.labels.shift();
+                        telemetryChart.data.datasets[0].data.shift();
+                        telemetryChart.data.datasets[1].data.shift();
+                    }
+                    telemetryChart.update();
+                }
             }, 3000);
-        });
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('iotChart').getContext('2d');
+            telemetryChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['09:00:00', '09:00:03', '09:00:06', '09:00:09'],
+                    datasets: [
+                        {
+                            label: 'Lab Temp (°C)',
+                            data: [22.4, 22.5, 22.3, 22.4],
+                            borderColor: '#0ea5e9',
+                            backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Noise Level (dB)',
+                            data: [42, 48, 45, 52],
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { font: { family: 'Inter', size: 11 } } }
+                    },
+                    scales: {
+                        x: { grid: { display: false } },
+                        y: { grid: { color: 'rgba(156, 163, 175, 0.1)' } }
+                    }
+                }
+            });
+        }
+
+        // Helper to prevent XSS
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
     </script>
 </body>
 </html>
